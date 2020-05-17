@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script>
+            var j;
+            var xmlhttp = new XMLHttpRequest();
+            var url = "Dump.json";
+        
+            xmlhttp.onreadystatechange = function() {
+                if (this.readyState == 4 && this.status == 200) {
+                    j = JSON.parse(this.responseText);
+                    document.getElementById("demo").innerHTML = j["April"]["14"]["After School"]["1"]["Name"];
+                }
+            };
+            xmlhttp.open("GET", url, true);
+            xmlhttp.send();
+            
+        </script>
+        <style>
+            body
+            {
+                background-color: #FBE820;
+                font-family: "Trebuchet MS", Helvetica, sans-serif;
+                margin: 0;
+                padding: 20px 0;
+            }
+            a
+            {
+                color:white;
+            }
+            a:link
+            {
+                color:inherit;
+            }
+            .inner-div
+            {
+                margin: 0 auto;
+                max-width: 500px; 
+                background-color: darkgray;
+                border-radius: 20px;
+                overflow: hidden;
+            }
+            .content-block
+            {
+                background-color: darkslateblue;
+                padding: 10px;
+            }
+            .content-block h2
+            {
+                text-align: center;
+                font-size: 150%;
+            }
+            .event
+            {
+                /* padding: 0 50px; */
+                margin: 10px 0;
+                border-radius: 10px;
+                overflow: hidden;
+                background-color: greenyellow;
+            }
+            .location
+            {
+                margin: 10px;
+                border-radius: 10px;
+                overflow: hidden;
+                background-color: #00000020;
+                padding: 0 20px;
+            }
+            .event h3
+            {
+                text-align: center;
+                background-color: #00000020
+            }
+            .event p
+            {
+                padding: 0 20px;
+            }
+            .navbar {
+                overflow: hidden;
+                background-color: #333;
+                position: fixed;
+                bottom: 0;
+                /* padding: 10px 0; */
+                width: 100%;
+            }
+            .navbar-center
+            {
+                padding: 10px 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin: auto;
+                max-width: 500px; 
+            }
+            /* .styled-select {
+                width: 240px;
+                height: 34px;
+                overflow: hidden;
+                background: url(new_arrow.jpg) no-repeat right #ddd;
+                border: 1px solid #ccc;
+            } */
+            .styled-select {
+                background: transparent;
+                
+                padding: 5px;
+                font-size: 16px;
+                line-height: 1;
+                border: 0;
+                border-radius: 0;
+                height: 34px;
+                overflow: hidden;
+                background: #ddd;
+                border: 1px solid #ccc;
+                -webkit-appearance: none;
+            }
+            .select-box
+            {
+                padding: 5px 10px;
+                margin: 0 10px;
+                float: left;
+                border-radius: 10px;
+                overflow: hidden;
+                color: white;
+                background-color: #555;
+                text-align: center;
+            }
+            .reward-box
+            {
+                padding: 2px 5px;
+                margin-top: 3px;
+                border-radius: 10px;
+                overflow: hidden;
+                color: black;
+                background-color: #ddd;
+                text-align: center;
+            }
+            #early-morning
+            {
+                background-color: #E59700;
+            }
+            #morning
+            {
+                background-color: #D28600;
+            }
+            #lunch
+            {
+                background-color: #BF7600;
+            }
+            #afternoon
+            {
+                background-color: #B16A00;
+            }
+            #after-school
+            {
+                background-color: #A45E00;
+            }
+            #evening
+            {
+                background-color: #965300;
+            }
+        </style>
+    </head>
+<body>
+    <div class="navbar">
+        <div class="navbar-center">
+            <div class="select-box">
+                <a href="#">Prev</a>
+            </div>
+            <div class="select-box">
+                Month:
+                <select id="Month" class="styled-select">
+                    <option value="January">1</option>
+                    <option value="February">2</option>
+                    <option value="March">3</option>
+                    <option value="April">4</option>
+                    <option value="May">5</option>
+                    <option value="June">6</option>
+                    <option value="July">7</option>
+                    <option value="August">8</option>
+                    <option value="September">9</option>
+                    <option value="October">10</option>
+                    <option value="November">11</option>
+                    <option value="December">12</option>
+                </select>
+            </div>
+            <div class="select-box">
+                Day:
+                <select id='Day' class="styled-select">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                    <option value="6">6</option>
+                    <option value="7">7</option>
+                    <option value="8">8</option>
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                    <option value="13">13</option>
+                    <option value="14">14</option>
+                    <option value="15">15</option>
+                    <option value="16">16</option>
+                    <option value="17">17</option>
+                    <option value="18">18</option>
+                    <option value="19">19</option>
+                    <option value="20">20</option>
+                    <option value="21">21</option>
+                    <option value="22">22</option>
+                    <option value="23">23</option>
+                    <option value="24">24</option>
+                    <option value="25">25</option>
+                    <option value="26">26</option>
+                    <option value="27">27</option>
+                    <option value="28">28</option>
+                    <option value="29">29</option>
+                    <option value="30">30</option>
+                    <option value="31">31</option>
+                  </select>
+            </div>
+            <div class="select-box">
+                <a href="#">Next</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="inner-div">
+        <div class="content-block" id="early-morning">
+            <h2>Early Morning</h2>
+            <div class="event">
+                <h3>Mooroka's insult</h3>
+                <p id="demo"></p>
+            </div>
+        </div>
+        <div class="content-block" id="morning">
+            <h2>Morning</h2>
+            <div class="event">
+                <h3>Mooroka's insult</h3>
+                <p>Hello! Hello! Hello! Hello! Hello! Hello! Hello! Hello! Hello! </p>
+            </div>
+            <div class="event" style="background-color: #2FF4FF;">
+                <h3>Chariot 4</h3>
+                <div class="location"><b>Location:</b> School rooftop</div>
+                </br>
+                <div class="navbar-center">
+                    <div class="select-box">
+                        1</br>
+                        <div class="reward-box">+2</div>
+                    </div>
+                    <div class="select-box">
+                        Any
+                    </div>
+                    <div class="select-box">
+                        1/2
+                    </div>
+                    <div class="select-box">
+                        3</br>
+                        <div class="reward-box">+3</div>
+                    </div>
+                    <div class="select-box">
+                        5</br>
+                        <div class="reward-box">Courage increase</div>
+                    </div>
+                    <div class="select-box">
+                        3
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+</html>
