@@ -3,18 +3,442 @@
 <html>
     <head>
         <script>
+            // FIX PAGE 902
             var j;
             var xmlhttp = new XMLHttpRequest();
             var url = "Dump.json";
+            var ready = false;
+            var contentDiv;
+            var requiredDiv;
+            var requiredArcana;
         
             xmlhttp.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
                     j = JSON.parse(this.responseText);
                     document.getElementById("demo").innerHTML = j["April"]["14"]["After School"]["1"]["Name"];
+                    ready = true;
+                    contentDiv = document.getElementById("content-div");
+                    requiredDiv = document.getElementById("requirement-div");
+                    requiredArcana = document.getElementById("req-arcana");
                 }
             };
             xmlhttp.open("GET", url, true);
             xmlhttp.send();
+
+            function progressDay(increment)
+            {
+                var day = document.getElementById("Day");
+                var month = document.getElementById("Month");
+                for(var i = 0; i < 31; i++)
+                {
+                    if(increment < 0)
+                    {
+                        if(day.selectedIndex == 0)
+                        {
+                            day.selectedIndex = 30;
+                            if(month.selectedIndex == 0)
+                            {
+                                month.selectedIndex = 11;
+                            }
+                            else
+                            {
+                                month.selectedIndex--;
+                            }
+                        }
+                        else
+                        {
+                            day.selectedIndex--;
+                        }
+                    }
+                    else
+                    {
+                        if(day.selectedIndex == 30)
+                        {
+                            day.selectedIndex = 0;
+                            if(month.selectedIndex == 11)
+                            {
+                                month.selectedIndex = 0;
+                            }
+                            else
+                            {
+                                month.selectedIndex++;
+                            }
+                        }
+                        else
+                        {
+                            day.selectedIndex++;
+                        }
+                    }
+
+                    if(j[month.value][day.value] != null)
+                    {
+                        break;
+                    }
+                }
+                changeDay();
+            }
+
+            function changeDay()
+            {
+                document.body.scrollTop = 0;
+                document.documentElement.scrollTop = 0;
+                if(!ready)
+                {
+                    return;
+                }
+                // Delete everything
+
+                while (contentDiv.firstChild) {   
+                    contentDiv.removeChild(contentDiv.lastChild);
+                }
+                // Check if the given date is valid
+                var month = document.getElementById("Month").value;
+                var day = document.getElementById("Day").value;
+                var today = j[month][day];
+                var block;
+                var header;
+                if(today == null)
+                {
+                    block = document.createElement("div");
+                    block.className = "content-block";
+                    header = document.createElement("h2");
+                    header.appendChild(document.createTextNode("Nothing"));
+                    block.appendChild(header);
+                    contentDiv.appendChild(block);
+                }
+                else
+                {
+                    // -------------------------
+                    if(today["Requirement"] != null)
+                    {
+                        if(requiredDiv.style.display === "none")
+                        {
+                            requiredDiv.style.display = "block";
+                        }
+
+                        while (requiredArcana.firstChild) {   
+                            requiredArcana.removeChild(requiredArcana.lastChild);
+                        }
+                        var selectBox;
+                        for(var i = 0; i < 10; i++)
+                        {
+                            if(today["Requirement"][i] != null)
+                            {
+                                selectBox = document.createElement("div");
+                                selectBox.className = "select-box";
+                                selectBox.appendChild(document.createTextNode(today["Requirement"][i]));
+                                requiredArcana.appendChild(selectBox);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if(requiredDiv.style.display === "block")
+                        {
+                            requiredDiv.style.display = "none";
+                        }
+                    }
+
+                    timeOfDay(null, month + " " + day + " (" + today["Name"] + ")","date");
+
+                    if(today["Early Morning"] != null)
+                    {
+                        timeOfDay(today, "Early Morning","early-morning");
+                    }
+                    if(today["Morning"] != null)
+                    {
+                        timeOfDay(today, "Morning","morning");
+                    }
+                    if(today["Lunchtime"] != null)
+                    {
+                        timeOfDay(today, "Lunchtime","lunch");
+                    }
+                    if(today["Afternoon"] != null)
+                    {
+                        timeOfDay(today, "Afternoon","afternoon");
+                    }
+                    if(today["Daytime"] != null)
+                    {
+                        timeOfDay(today, "Daytime","afternoon");
+                    }
+                    if(today["After School"] != null)
+                    {
+                        timeOfDay(today, "After School","after-school");
+                    }
+                    if(today["Evening"] != null)
+                    {
+                        timeOfDay(today, "Evening","evening");
+                    }
+                }
+
+            }
+
+            function timeOfDay(today, time, id)
+            {
+                var block;
+                var header;
+                block = document.createElement("div");
+                block.className = "content-block";
+                block.id = id;
+                header = document.createElement("h2");
+                header.appendChild(document.createTextNode(time));
+                block.appendChild(header);
+                if(today != null)
+                {
+                    for(var i = 1; i < 10; i++)
+                    {
+                        if(today[time][i] != null)
+                        {
+                            if(today[time][i]["Name"] === "Social")
+                            {
+                                socialEvent(today[time][i], block);
+                            }
+                            else
+                            {
+                                timeEvent(today[time][i], block);
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                contentDiv.appendChild(block);
+            }
+            function socialEvent(event, block)
+            {
+                var eventDiv;
+                var header;
+                eventDiv = document.createElement("div");
+                eventDiv.className = "event";
+                eventDiv.style = "background-color: #2FF4FF";
+                header = document.createElement("h3");
+                if(event["Auto"] != null)
+                {
+                    header.appendChild(document.createTextNode(event["Arcana"]+' Lv.'+event["Level"]+' (Automatic)'));
+                    eventDiv.appendChild(header);
+                }
+                else
+                {
+                    header.appendChild(document.createTextNode(event["Arcana"]+' Lv.'+event["Level"]));
+                    eventDiv.appendChild(header);
+                    //<div class="location"><b>Location:</b> School rooftop</div>
+                    if(event["Location"] != null)
+                    {
+                        var location = document.createElement("div");
+                        location.className = "location";
+                        header = document.createElement("b");
+                        header.appendChild(document.createTextNode("Location: "));
+                        location.appendChild(header);
+                        location.appendChild(document.createTextNode(event["Location"]));
+                        eventDiv.appendChild(location);
+                    }
+    
+                    if(event["Arcana"] === "Sun" || event["Arcana"] === "Strength")
+                    {
+    
+                    }
+                    else
+                    {
+                        var list = document.createElement("div");
+                        list.className = "navbar-center";
+                        var textlist = [];
+                        optionFunc(event["Option"], list, textlist);
+                        eventDiv.appendChild(list);
+                        if(textlist.length > 0)
+                        {
+                            var notes = document.createElement("ol");
+                            for(var i = 0; i < textlist.length; i++)
+                            {
+                                var note = document.createElement("li");
+                                note.appendChild(document.createTextNode(textlist[i]));
+                                notes.appendChild(note);
+                            }
+                            eventDiv.appendChild(notes);
+                        }
+                    }
+                }
+
+                if(event["Text"] != null)
+                {
+                    var list = document.createElement("ul");
+                    var pointElement;
+                    for(var i = 0; i < 10; i++)
+                    {
+                        if(event["Text"][i] != null)
+                        {
+                            pointElement = document.createElement("li");
+                            pointElement.appendChild(document.createTextNode(event["Text"][i]));
+                            list.appendChild(pointElement);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    eventDiv.appendChild(list);
+                }
+                block.appendChild(eventDiv);
+            }
+            function timeEvent(event, block)
+            {
+                var eventDiv;
+                var header;
+                eventDiv = document.createElement("div");
+                eventDiv.className = "event";
+                header = document.createElement("h3");
+                header.appendChild(document.createTextNode(event["Name"]));
+                eventDiv.appendChild(header);
+
+                if(event["Reply"] != null)
+                {
+                    var list = document.createElement("dl");
+                    replyFunc(event["Reply"], list);
+                    eventDiv.appendChild(list);
+                }
+
+                if(event["Option"] != null)
+                {
+                    var list = document.createElement("div");
+                    eventDiv.className = "navbar-center";
+                    var textlist = [];
+                    optionFunc(event["Option"], list, textlist);
+                    eventDiv.appendChild(list);
+                    if(textlist.length > 0)
+                    {
+                        var notes = document.createElement("ol");
+                        for(var i = 0; i < textlist.length; i++)
+                        {
+                            var note = document.createElement("li");
+                            note.appendChild(document.createTextNode(textlist[i]));
+                            notes.appendChild(note);
+                        }
+                        eventDiv.appendChild(notes);
+                    }
+                    //<div class="navbar-center">
+                    //<div class="select-box">
+                    //    1</br>
+                    //    <div class="reward-box">+2</div>
+                    //</div>
+                    eventDiv.appendChild(list);
+                }
+
+                if(event["Text"] != null)
+                {
+                    var list = document.createElement("ul");
+                    var pointElement;
+                    for(var i = 0; i < 10; i++)
+                    {
+                        if(event["Text"][i] != null)
+                        {
+                            pointElement = document.createElement("li");
+                            pointElement.appendChild(document.createTextNode(event["Text"][i]));
+                            list.appendChild(pointElement);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    eventDiv.appendChild(list);
+                }
+                //alert(event["Name"]);
+                //<div class="event">
+                //<h3>Mooroka's insult</h3>
+                block.appendChild(eventDiv);
+            }
+
+            function replyFunc(event, list)
+            {
+                var answer = document.createElement("dt");
+                answer.appendChild(document.createTextNode('-"'+event["Answer"]+'"'));
+                list.appendChild(answer);
+                if(event["Reward"] != null)
+                {
+                    var reward = document.createElement("dd");
+                    if(event["Reward"] === "Points")
+                    {
+                        reward.appendChild(document.createTextNode(event["Person"]+' +'+event["Points"]));
+                    }
+                    else
+                    {
+                        reward.appendChild(document.createTextNode(event["Reward"]+' UP!'));
+                    }
+                    list.appendChild(reward);
+                }
+
+                if(event["Reply"] != null)
+                {
+                    replyFunc(event["Reply"], list);
+                }
+            }
+
+            function optionFunc(event, list, textlist)
+            {
+                //<div class="select-box">
+                    //    1</br>
+                    //    <div class="reward-box">+2</div>
+                var selectBox = document.createElement("div");
+                selectBox.className = "select-box";
+                if(event["Pick"][0] === 0)
+                {
+                    selectBox.appendChild(document.createTextNode('Any'));
+
+                }
+                else
+                {
+                    selectBox.appendChild(document.createTextNode(event["Pick"][0]));
+                    for(var i = 1; i < 5; i++)
+                    {
+                        if(event["Pick"][i] != null)
+                        {
+                            selectBox.appendChild(document.createTextNode('/'+event["Pick"][i]));
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+                // ADD SUPPORT FOR TEXT HERE
+                if(event["Text"] != null)
+                {
+                    var sup = document.createElement("sup");
+                    sup.appendChild(document.createTextNode(textlist.length+1));
+                    selectBox.appendChild(sup);
+
+                    textlist.push(event["Text"]);
+                }
+
+                if((event["Points"] != null && event["Points"] !== 0) || event["Reward"] != null)
+                {
+                    selectBox.appendChild(document.createElement("br"));
+                    var reward = document.createElement("div");
+                    reward.className = "reward-box";
+                    if(event["Reward"] != null)
+                    {
+                        reward.appendChild(document.createTextNode('+'+event["Points"]+' '));
+                    }
+                    
+                    if(event["Points"] != null && event["Points"] !== 0)
+                    {
+                        reward.appendChild(document.createTextNode('+'+event["Points"]));
+                    }
+                    selectBox.appendChild(reward);
+                }
+                list.appendChild(selectBox);
+
+                if(event["Option"] != null)
+                {
+                    optionFunc(event["Option"], list, textlist);
+                }
+            }
             
         </script>
         <style>
@@ -38,6 +462,7 @@
             .inner-div
             {
                 margin: 0 auto;
+                margin-bottom: 5vmin;
                 max-width: 100vmin; 
                 width: 100vw;
                 background-color: darkgray;
@@ -46,10 +471,10 @@
             }
             .content-block
             {
-                background-color: darkslateblue;
+                background-color: gray;
                 padding: 1vmin;
             }
-            .content-block h2
+            h2
             {
                 text-align: center;
                 font-size: 6vmin;
@@ -140,6 +565,11 @@
                 background-color: #ddd;
                 text-align: center;
             }
+            #date
+            {
+                background-color: #333;
+                color: white;
+            }
             #early-morning
             {
                 background-color: #E59700;
@@ -170,11 +600,11 @@
     <div class="navbar">
         <div class="navbar-center">
             <div class="select-box">
-                <a href="#">Prev</a>
+                <a href="javascript:progressDay(-1);">Prev</a>
             </div>
             <div class="select-box">
                 Month:
-                <select id="Month" class="styled-select">
+                <select id="Month" class="styled-select" onchange="changeDay()">
                     <option value="January">1</option>
                     <option value="February">2</option>
                     <option value="March">3</option>
@@ -191,16 +621,16 @@
             </div>
             <div class="select-box">
                 Day:
-                <select id='Day' class="styled-select">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
+                <select id='Day' class="styled-select" onchange="changeDay()">
+                    <option value="01">1</option>
+                    <option value="02">2</option>
+                    <option value="03">3</option>
+                    <option value="04">4</option>
+                    <option value="05">5</option>
+                    <option value="06">6</option>
+                    <option value="07">7</option>
+                    <option value="08">8</option>
+                    <option value="09">9</option>
                     <option value="10">10</option>
                     <option value="11">11</option>
                     <option value="12">12</option>
@@ -226,12 +656,28 @@
                   </select>
             </div>
             <div class="select-box">
-                <a href="#">Next</a>
+                <a href="javascript:progressDay(1);">Next</a>
             </div>
         </div>
     </div>
-
-    <div class="inner-div">
+    <div id="requirement-div" class="inner-div" style="display: none;">
+        <h2>Required Personas</h2>
+        <div id="req-arcana" class="navbar-center">
+            <div class="select-box">
+                Magician
+            </div>
+            <div class="select-box">
+                Justice
+            </div>
+            <div class="select-box">
+                Empress
+            </div>
+            <div class="select-box">
+                Hanged Man
+            </div>
+        </div>
+    </div>
+    <div id="content-div" class="inner-div">
         <div class="content-block" id="early-morning">
             <h2>Early Morning</h2>
             <div class="event">
@@ -266,7 +712,7 @@
                     </div>
                     <div class="select-box">
                         5</br>
-                        <div class="reward-box">Courage increase</div>
+                        <div class="reward-box">+Courage</div>
                     </div>
                     <div class="select-box">
                         3
